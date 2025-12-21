@@ -1,0 +1,9 @@
+
+ø+src/main/scala/solutions/domain/Model.scala2
+ 
+solutions/2
+ solutions/domain/:ï
+ æNo class, trait or object is defined in the compilation unit.
+The incremental compiler cannot record the dependency information in such case.
+Some errors like unused import referring to a non-existent class might not be reported.
+PZ 53FC4EB697F5EC001B9F876D72819886
