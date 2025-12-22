@@ -21,11 +21,11 @@ object Bank {
    */
   def apply(initialBalances: Map[String, BigDecimal]): Behavior[BankProtocol.Command] =
     Behaviors.setup { _ =>
-      running(State(initialBalances.withDefaultValue(BigDecimal(0))))
+      running(State(initialBalances))
     }
 
   private def running(state: State): Behavior[BankProtocol.Command] =
-    Behaviors.receive { (_, msg) =>
+    Behaviors.receive { (ctx, msg) =>
       msg match {
 
         case BankProtocol.ChargeAndPay(
@@ -40,6 +40,7 @@ object Bank {
 
           if (passengerBalance < fare) {
             // insufficient funds
+            ctx.log.warn(s"Payment failed for ride $rideId: INSUFFICIENT_FUNDS (passenger: $passengerId, balance: $passengerBalance, fare: $fare)")
             replyTo ! DispatcherProtocol.PaymentResult(
               rideId = rideId,
               success = false,
@@ -54,6 +55,8 @@ object Bank {
                 .updated(passengerId, passengerBalance - fare)
                 .updated(driverId, driverBalance + fare)
 
+            ctx.log.info(s"Payment successful for ride $rideId: passenger $passengerId paid $$${fare} to driver $driverId")
+            
             replyTo ! DispatcherProtocol.PaymentResult(
               rideId = rideId,
               success = true,

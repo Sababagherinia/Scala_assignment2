@@ -29,8 +29,11 @@ object Main  {
       val bank =
         ctx.spawn(
           Bank(
-            initialBalances =
-              Map.empty.withDefaultValue(BigDecimal(200))
+            initialBalances = Map(
+              "passenger-3"  -> BigDecimal(10),
+              "passenger-7"  -> BigDecimal(5),
+              "passenger-12" -> BigDecimal(8)
+            ).withDefaultValue(BigDecimal(200))
           ),
           "bank"
         )

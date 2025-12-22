@@ -154,6 +154,7 @@ object Dispatcher {
             case None => Behaviors.same
 
             case Some(ride) if !allowed =>
+              ctx.log.warn(s"Ride $rideId rejected: passenger $passengerId is blacklisted")
               ride.replyTo ! RideRejected("Passenger is blacklisted")
               running(
                 pricingService,
@@ -260,6 +261,39 @@ object Dispatcher {
                 state,
                 rideId
               )
+          }
+
+        /* =========================
+         * Ride completion - trigger payment
+         * ========================= */
+
+        case RideCompleted(rideId, driverId) =>
+          state.rides.get(rideId) match {
+            case Some(ride) =>
+              // Request payment from bank
+              bank ! BankProtocol.ChargeAndPay(
+                rideId = rideId,
+                passengerId = ride.passengerId,
+                driverId = driverId,
+                fare = ride.fare.getOrElse(BigDecimal(0)),
+                replyTo = ctx.self
+              )
+
+              monitor ! MonitorProtocol.LogEvent(
+                MonitorProtocol.RideEvent.RideCompleted(
+                  rideId = rideId,
+                  driverId = driverId,
+                  passengerId = ride.passengerId,
+                  fare = ride.fare.getOrElse(BigDecimal(0)),
+                  durationSeconds = 0,
+                  timestampMillis = System.currentTimeMillis()
+                )
+              )
+
+              Behaviors.same
+
+            case None =>
+              Behaviors.same
           }
 
         /* =========================

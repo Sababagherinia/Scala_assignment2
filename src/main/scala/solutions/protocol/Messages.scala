@@ -45,6 +45,11 @@ object DispatcherProtocol:
 
   final case class DriverOffline(driverId: String) extends Command
 
+  final case class RideCompleted(
+    rideId: String,
+    driverId: String
+  ) extends Command
+
   /* Internal adapter responses */
   final case class BlacklistCheckResult(
     rideId: String,

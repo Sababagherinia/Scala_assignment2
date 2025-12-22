@@ -122,10 +122,9 @@ object Driver {
             location.y + scala.util.Random.nextDouble() * 10
           )
 
-          dispatcher ! DispatcherProtocol.PaymentResult(
+          dispatcher ! DispatcherProtocol.RideCompleted(
             rideId = rideId,
-            success = true,
-            reason = None
+            driverId = driverId
           )
 
           running(dispatcher, timers, driverId, newLocation, available = true)
