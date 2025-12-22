@@ -175,6 +175,7 @@ object MonitorProtocol:
   final case class QueryTotalRevenue(replyTo: ActorRef[TotalRevenue]) extends Command
   final case class QueryBusiestHour(replyTo: ActorRef[BusiestHour]) extends Command
   final case class QueryMostProfitableDriver(replyTo: ActorRef[MostProfitableDriver]) extends Command
+  final case class QueryAverageRideTime(replyTo: ActorRef[AverageRideTime]) extends Command
 
   /* Persistent events */
   enum RideEvent:
@@ -196,3 +197,4 @@ object MonitorProtocol:
   final case class TotalRevenue(amount: BigDecimal)
   final case class BusiestHour(hour: Int, rideCount: Int)
   final case class MostProfitableDriver(driverId: String, earnings: BigDecimal)
+  final case class AverageRideTime(averageSeconds: Double)

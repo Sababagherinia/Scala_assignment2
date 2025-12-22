@@ -19,10 +19,13 @@ object RideMonitor {
     // driverId -> total earnings from completed rides
     driverEarnings: Map[String, BigDecimal],
     // driverId -> (sumRatings, count)
-    driverRatings: Map[String, (Long, Long)]
+    driverRatings: Map[String, (Long, Long)],
+    // Total duration and count for calculating average
+    totalRideDuration: Long,
+    totalCompletedRides: Long
   ) {
 
-    def recordCompletedRide(tsMillis: Long, driverId: String, fare: BigDecimal): State = {
+    def recordCompletedRide(tsMillis: Long, driverId: String, fare: BigDecimal, durationSeconds: Int): State = {
       val hour = RideMonitor.hourOf(tsMillis)
       val newCount = completedRidesByHour.getOrElse(hour, 0) + 1
       val newEarn = driverEarnings.getOrElse(driverId, BigDecimal(0)) + fare
@@ -30,9 +33,15 @@ object RideMonitor {
       copy(
         totalRevenue = totalRevenue + fare,
         completedRidesByHour = completedRidesByHour.updated(hour, newCount),
-        driverEarnings = driverEarnings.updated(driverId, newEarn)
+        driverEarnings = driverEarnings.updated(driverId, newEarn),
+        totalRideDuration = totalRideDuration + durationSeconds,
+        totalCompletedRides = totalCompletedRides + 1
       )
     }
+
+    def averageRideTime: Double = 
+      if (totalCompletedRides == 0) 0.0
+      else totalRideDuration.toDouble / totalCompletedRides
 
     def recordDriverRating(driverId: String, rating: Int): State = {
       val (sum, count) = driverRatings.getOrElse(driverId, (0L, 0L))
@@ -45,7 +54,9 @@ object RideMonitor {
       totalRevenue = BigDecimal(0),
       completedRidesByHour = Map.empty,
       driverEarnings = Map.empty,
-      driverRatings = Map.empty
+      driverRatings = Map.empty,
+      totalRideDuration = 0L,
+      totalCompletedRides = 0L
     )
   }
 
@@ -87,13 +98,17 @@ object RideMonitor {
             replyTo ! MonitorProtocol.MostProfitableDriver(driverId, earnings)
           }
           Effect.none
+
+        case MonitorProtocol.QueryAverageRideTime(replyTo) =>
+          replyTo ! MonitorProtocol.AverageRideTime(state.averageRideTime)
+          Effect.none
       }
 
   private val eventHandler: (State, RideEvent) => State =
     (state, evt) =>
       evt match {
-        case RideEvent.RideCompleted(_, driverId, _, fare, _, tsMillis) =>
-          state.recordCompletedRide(tsMillis, driverId, fare)
+        case RideEvent.RideCompleted(_, driverId, _, fare, durationSeconds, tsMillis) =>
+          state.recordCompletedRide(tsMillis, driverId, fare, durationSeconds)
 
         case RideEvent.DriverRated(driverId, rating, _) =>
           state.recordDriverRating(driverId, rating)

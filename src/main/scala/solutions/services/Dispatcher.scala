@@ -27,7 +27,8 @@ object Dispatcher {
     replyTo: ActorRef[RideResponse],
     candidates: List[String],
     selectedDriver: Option[String],
-    fare: Option[BigDecimal]
+    fare: Option[BigDecimal],
+    startTimeMillis: Long = System.currentTimeMillis()
   )
 
   final case class State(
@@ -270,6 +271,9 @@ object Dispatcher {
         case RideCompleted(rideId, driverId) =>
           state.rides.get(rideId) match {
             case Some(ride) =>
+              val now = System.currentTimeMillis()
+              val durationSeconds = ((now - ride.startTimeMillis) / 1000).toInt
+              
               // Request payment from bank
               bank ! BankProtocol.ChargeAndPay(
                 rideId = rideId,
@@ -285,8 +289,8 @@ object Dispatcher {
                   driverId = driverId,
                   passengerId = ride.passengerId,
                   fare = ride.fare.getOrElse(BigDecimal(0)),
-                  durationSeconds = 0,
-                  timestampMillis = System.currentTimeMillis()
+                  durationSeconds = durationSeconds,
+                  timestampMillis = now
                 )
               )
 
