@@ -61,6 +61,8 @@ object Passenger {
          * ========================= */
 
         case RequestRideTick =>
+          ctx.log.info(s"Passenger $passengerId requesting ride")
+          
           val pickup = randomCoord()
           val dropoff = randomCoord()
 

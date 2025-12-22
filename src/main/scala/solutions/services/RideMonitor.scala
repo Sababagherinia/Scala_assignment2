@@ -8,9 +8,6 @@ import solutions.protocol.MonitorProtocol.{Command, RideEvent}
 
 /**
  * RideMonitor: persistent event log + analytics aggregator.
- *
- * With the TA config (inmem journal + local snapshots),
- * this actor restores its state after actor failure/restart in the same JVM.
  */
 object RideMonitor {
 
@@ -60,7 +57,7 @@ object RideMonitor {
       commandHandler = commandHandler,
       eventHandler = eventHandler
     )
-      // snapshot occasionally (works with akka.persistence.snapshot-store.local)
+      // snapshot occasionally
       .snapshotWhen { (_, _, seqNr) => seqNr % 200 == 0 }
 
   private val commandHandler: (State, Command) => Effect[RideEvent, State] =
@@ -102,7 +99,7 @@ object RideMonitor {
           state.recordDriverRating(driverId, rating)
 
         // For now we don’t aggregate other events, but we still persist them
-        // so they can be used later (debugging / richer analytics).
+        // so they can be used later.
         case _ =>
           state
       }

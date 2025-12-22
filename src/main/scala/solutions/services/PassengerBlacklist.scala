@@ -33,7 +33,6 @@ object PassengerBlacklist {
           Behaviors.same
 
         case BlacklistProtocol.Blacklist(passengerId, reason) =>
-          // We ignore the reason for now, but keep it for extensibility
           running(state.copy(bannedPassengers = state.bannedPassengers + passengerId))
       }
     }

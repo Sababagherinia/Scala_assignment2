@@ -7,10 +7,6 @@ import solutions.protocol.{DispatcherProtocol, PricingProtocol}
 
 /**
  * PricingService computes ride fares based on distance and time of day.
- *
- * Stateless actor:
- *  - easy to test
- *  - easy to reason about
  */
 object PricingService {
 

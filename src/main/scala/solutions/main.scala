@@ -8,6 +8,8 @@ import solutions.services.*
 import solutions.actors.*
 import solutions.domain.*
 import solutions.protocol.DispatcherProtocol
+import akka.actor.typed.scaladsl.adapter.*
+
 
 object Main  {
 
@@ -85,18 +87,10 @@ object Main  {
         )
       }
 
-      /* =========================
-       * Optional: demonstrate recovery
-       * ========================= */
-      // Uncomment if you want to show Dispatcher restart
-      //
-      // ctx.scheduleOnce(30.seconds, dispatcher) {
-      //   throw new RuntimeException("Simulated dispatcher crash")
-      // }
-
-      ctx.log.info("🚕 Ride-sharing simulation started")
+      ctx.log.info("Ride-sharing simulation started")
 
       Behaviors.empty
+      
     }
 
   private def randomCoord(): Coord =
@@ -105,6 +99,13 @@ object Main  {
       y = scala.util.Random.nextDouble() * 100
     )
 
-  def main(args: Array[String]): Unit =
-    ActorSystem(Main(), "RideSharingSimulation")
+  def main(args: Array[String]): Unit = {
+    val system = ActorSystem(Main(), "RideSharingSimulation")
+    
+    // Keep the system running
+    println("Press Enter to stop...")
+    scala.io.StdIn.readLine()
+    println("Simulation ended")
+    system.terminate()
+  }
 }
