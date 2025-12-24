@@ -26,20 +26,20 @@ The system is composed of the following actor components:
 ### 2.2 Component diagram (structure)
 ```mermaid
 flowchart LR
-  P[Passenger (actor)] -->|RequestRide / CancelRide| D[Dispatcher (actor)]
-  Dr[Driver (actor)] -->|RegisterDriver / LocationUpdate| D
+  P[Passenger (actor)] -->|RequestRide, CancelRide| D[Dispatcher (actor)]
+  Dr[Driver (actor)] -->|RegisterDriver, LocationUpdate| D
   D -->|ComputeFare| PS[PricingService (actor)]
   PS -->|FareQuoteResult| D
-  D -->|OfferRide / StartRide| Dr
-  Dr -->|DriverDecision / RideCompleted| D
-  D -->|IsBlacklisted / Blacklist| BL[PassengerBlacklist (actor)]
+  D -->|OfferRide, StartRide| Dr
+  Dr -->|DriverDecision, RideCompleted| D
+  D -->|IsBlacklisted, Blacklist| BL[PassengerBlacklist (actor)]
   BL -->|BlacklistCheckResult| D
   D -->|ChargeAndPay| B[Bank (actor)]
   B -->|PaymentResult| D
   D -->|LogEvent| RM[RideMonitor (event-sourced actor)]
 
   subgraph Analytics
-    RM -->|Query* (ask)| Q[Dashboard query in Main]
+    RM -->|Query (ask)| Q[Dashboard query in Main]
   end
 ```
 
@@ -75,12 +75,12 @@ sequenceDiagram
     Dispatcher-->>Passenger: RideRejected("Passenger is blacklisted")
   else allowed
     Note over Dispatcher: compute candidate drivers by distance
-    Dispatcher->>Pricing: ComputeFare(rideId, ..., driverId, minFare)
+    Dispatcher->>Pricing: ComputeFare(rideId, pickup, dropoff, time, driverId, minFare)
     Pricing-->>Dispatcher: FareQuoteResult(rideId, driverId, fare, compatible)
 
     alt compatible fare
       Dispatcher->>Driver: OfferRide(rideId, pickup, dropoff, fare, replyTo=Dispatcher)
-      Driver-->>Dispatcher: DriverDecision(rideId, accepted?)
+      Driver-->>Dispatcher: DriverDecision(rideId, accepted)
 
       alt accepted
         Dispatcher->>Monitor: LogEvent(RideMatched)
@@ -89,7 +89,7 @@ sequenceDiagram
         Driver-->>Dispatcher: RideCompleted(rideId, driverId)
 
         Dispatcher->>Bank: ChargeAndPay(rideId, passengerId, driverId, fare)
-        Bank-->>Dispatcher: PaymentResult(rideId, success, reason?)
+        Bank-->>Dispatcher: PaymentResult(rideId, success, reason)
 
         Dispatcher->>Monitor: LogEvent(RideCompleted)
         opt payment failed
