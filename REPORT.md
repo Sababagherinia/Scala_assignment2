@@ -26,21 +26,17 @@ The system is composed of the following actor components:
 ### 2.2 Component diagram (structure)
 ```mermaid
 flowchart LR
-  P[Passenger (actor)] -->|RequestRide, CancelRide| D[Dispatcher (actor)]
-  Dr[Driver (actor)] -->|RegisterDriver, LocationUpdate| D
-  D -->|ComputeFare| PS[PricingService (actor)]
-  PS -->|FareQuoteResult| D
-  D -->|OfferRide, StartRide| Dr
-  Dr -->|DriverDecision, RideCompleted| D
-  D -->|IsBlacklisted, Blacklist| BL[PassengerBlacklist (actor)]
-  BL -->|BlacklistCheckResult| D
-  D -->|ChargeAndPay| B[Bank (actor)]
-  B -->|PaymentResult| D
-  D -->|LogEvent| RM[RideMonitor (event-sourced actor)]
-
-  subgraph Analytics
-    RM -->|Query (ask)| Q[Dashboard query in Main]
-  end
+  Passenger[Passenger] --> Dispatcher[Dispatcher]
+  Driver[Driver] --> Dispatcher
+  Dispatcher --> PricingService[PricingService]
+  PricingService --> Dispatcher
+  Dispatcher --> Driver
+  Dispatcher --> PassengerBlacklist[PassengerBlacklist]
+  PassengerBlacklist --> Dispatcher
+  Dispatcher --> Bank[Bank]
+  Bank --> Dispatcher
+  Dispatcher --> RideMonitor[RideMonitor]
+  Main[Main] --> RideMonitor
 ```
 
 ### 2.3 Message boundaries
