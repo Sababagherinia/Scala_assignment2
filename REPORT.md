@@ -46,6 +46,25 @@ All interactions happen through typed protocol messages defined in:
 Domain data types (coordinates, ride/driver metadata) are defined in:
 - [src/main/scala/solutions/domain/Models.scala](src/main/scala/solutions/domain/Models.scala)
 
+### 2.4 Key domain types and protocols (quick reference)
+This section briefly summarizes the most important types used throughout the system.
+
+**Domain models** ([src/main/scala/solutions/domain/Models.scala](src/main/scala/solutions/domain/Models.scala))
+- `Coord`: 2D coordinate with a `distanceTo` helper used for proximity-based driver selection.
+- `Availability`: driver availability flags (`OnlineAvailable`, `OnlineBusy`, `Offline`).
+- `RideStatus`: ride lifecycle status values.
+- `Ride`: immutable ride record (ids, pickup/dropoff, status, assigned driver, fare, timestamps).
+- `DriverInfo`: runtime driver metadata (location, availability, minimum fare, earnings, ratings).
+- `PassengerInfo`: passenger metadata.
+
+**Typed protocols** ([src/main/scala/solutions/protocol/Messages.scala](src/main/scala/solutions/protocol/Messages.scala))
+- `DispatcherProtocol`: main orchestration protocol (ride requests/cancellation/ETA, driver registration and updates, plus internal adapter replies).
+- `DriverProtocol`: driver-facing commands (`OfferRide`, `StartRide`, `CancelRide`).
+- `PricingProtocol`: fare computation request (`ComputeFare`).
+- `BankProtocol`: payment execution request (`ChargeAndPay`).
+- `BlacklistProtocol`: blacklist queries and updates.
+- `MonitorProtocol`: event logging and analytics queries; defines the persistent `RideEvent` model.
+
 ## 3. Runtime behavior and message flows
 
 ### 3.1 Ride request → matching → completion → payment
