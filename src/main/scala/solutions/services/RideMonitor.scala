@@ -6,12 +6,10 @@ import akka.persistence.typed.scaladsl.{Effect, EventSourcedBehavior}
 import solutions.protocol.MonitorProtocol
 import solutions.protocol.MonitorProtocol.{Command, RideEvent}
 
-/**
- * RideMonitor: persistent event log + analytics aggregator.
- */
+//  RideMonitor aggregates ride events for analytics.
 object RideMonitor {
 
-  /** Aggregated analytics state rebuilt by replaying RideEvent events. */
+  //  Aggregated analytics state rebuilt by replaying RideEvent events. 
   final case class State(
     totalRevenue: BigDecimal,
     // hour -> completed ride count
@@ -60,7 +58,7 @@ object RideMonitor {
     )
   }
 
-  /** Public factory */
+  // Public factory method
   def apply(persistenceKey: String = "ride-monitor"): Behavior[Command] =
     EventSourcedBehavior[Command, RideEvent, State](
       persistenceId = PersistenceId.ofUniqueId(persistenceKey),
@@ -68,7 +66,7 @@ object RideMonitor {
       commandHandler = commandHandler,
       eventHandler = eventHandler
     )
-      // snapshot occasionally
+      // snapshot occasionally to speed up recovery
       .snapshotWhen { (_, _, seqNr) => seqNr % 200 == 0 }
 
   private val commandHandler: (State, Command) => Effect[RideEvent, State] =

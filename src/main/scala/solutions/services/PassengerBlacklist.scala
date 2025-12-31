@@ -4,15 +4,9 @@ import akka.actor.typed.Behavior
 import akka.actor.typed.scaladsl.Behaviors
 import solutions.protocol.{BlacklistProtocol, DispatcherProtocol}
 
-/**
- * PassengerBlacklist maintains a set of banned passengers.
- *
- * Passengers are blacklisted if they complete a ride
- * without sufficient funds.
- */
 object PassengerBlacklist {
 
-  /** Internal state */
+  //  Internal state
   final case class State(
     bannedPassengers: Set[String]
   )

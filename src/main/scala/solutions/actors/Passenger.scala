@@ -85,6 +85,7 @@ object Passenger {
           )
 
           // Optionally cancel before pickup (20% chance)
+          // for simplicity, we cancel after a fixed delay
           if (scala.util.Random.nextDouble() < 0.2) {
             timers.startSingleTimer(
               MaybeCancel(rideId),
@@ -97,7 +98,7 @@ object Passenger {
         /* =========================
          * Ride rejected
          * ========================= */
-
+        // log ride rejection
         case RideRejected(reason) =>
           ctx.log.info(s"Passenger $passengerId: ride rejected ($reason)")
           Behaviors.same
@@ -106,7 +107,7 @@ object Passenger {
           Behaviors.same
       }
     }
-
+  // Passenger is in a ride
   private def inRide(
     dispatcher: ActorRef[DispatcherProtocol.Command],
     timers: TimerScheduler[Msg],
@@ -143,7 +144,7 @@ object Passenger {
   /* =========================
    * Helpers
    * ========================= */
-
+// Generate a random coordinate within a 100x100 area
   private def randomCoord(): Coord =
     Coord(
       x = scala.util.Random.nextDouble() * 100,

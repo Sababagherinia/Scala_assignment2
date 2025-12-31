@@ -322,7 +322,7 @@ object Dispatcher {
           )
 
         /* =========================
-         * Cancellation (minimal)
+         * Cancellation
          * ========================= */
 
         case CancelRide(_, rideId) =>

@@ -4,14 +4,10 @@ import akka.actor.typed.Behavior
 import akka.actor.typed.scaladsl.Behaviors
 import solutions.protocol.{BankProtocol, DispatcherProtocol}
 
-/**
- * Bank actor:
- *  - maintains balances for passengers and drivers
- *  - handles payments after ride completion
- */
+
 object Bank {
 
-  /** Internal state */
+  // Internal state
   final case class State(
     balances: Map[String, BigDecimal]
   )
@@ -39,7 +35,7 @@ object Bank {
           val passengerBalance = state.balances(passengerId)
 
           if (passengerBalance < fare) {
-            // insufficient funds
+            // insufficient funds handling
             ctx.log.warn(s"Payment failed for ride $rideId: INSUFFICIENT_FUNDS (passenger: $passengerId, balance: $passengerBalance, fare: $fare)")
             replyTo ! DispatcherProtocol.PaymentResult(
               rideId = rideId,
@@ -54,7 +50,7 @@ object Bank {
               state.balances
                 .updated(passengerId, passengerBalance - fare)
                 .updated(driverId, driverBalance + fare)
-
+          //  log successful payment
             ctx.log.info(s"Payment successful for ride $rideId: passenger $passengerId paid $$${fare} to driver $driverId")
             
             replyTo ! DispatcherProtocol.PaymentResult(

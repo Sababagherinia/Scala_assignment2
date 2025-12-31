@@ -1,17 +1,17 @@
 package solutions.domain
 
-/** 2D coordinate used for pickup, dropoff and driver locations */
+// 2D coordinate used for pickup, dropoff and driver locations
 final case class Coord(x: Double, y: Double):
   def distanceTo(other: Coord): Double =
     math.hypot(x - other.x, y - other.y)
 
-/** Driver availability state */
+// Driver availability state
 enum Availability:
   case OnlineAvailable
   case OnlineBusy
   case Offline
 
-/** Ride lifecycle states */
+// Ride lifecycle states
 enum RideStatus:
   case Requested
   case Matching
@@ -20,7 +20,7 @@ enum RideStatus:
   case Completed
   case Cancelled
 
-/** Immutable ride description */
+// Immutable ride description
 final case class Ride(
   rideId: String,
   passengerId: String,
@@ -32,7 +32,7 @@ final case class Ride(
   requestedAtMillis: Long
 )
 
-/** Runtime driver metadata */
+// Runtime driver metadata
 final case class DriverInfo(
   id: String,
   location: Coord,
@@ -43,7 +43,7 @@ final case class DriverInfo(
   earnings: BigDecimal
 )
 
-/** Passenger metadata */
+// Passenger metadata
 final case class PassengerInfo(
   id: String,
   name: String,

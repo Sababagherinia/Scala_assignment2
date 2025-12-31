@@ -3,14 +3,14 @@ package solutions.protocol
 import akka.actor.typed.ActorRef
 import solutions.domain.*
 
-/* =========================================================
+/* ===========================
  * Dispatcher Protocol
- * ========================================================= */
+ * =========================== */
 object DispatcherProtocol:
 
   sealed trait Command
 
-  /* Passenger → Dispatcher */
+  // Passenger → Dispatcher
   final case class RequestRide(
     passengerId: String,
     pickup: Coord,
@@ -29,7 +29,7 @@ object DispatcherProtocol:
     replyTo: ActorRef[ETAResponse]
   ) extends Command
 
-  /* Driver → Dispatcher */
+  // Driver → Dispatcher
   final case class LocationUpdate(
     driverId: String,
     location: Coord,
@@ -50,7 +50,7 @@ object DispatcherProtocol:
     driverId: String
   ) extends Command
 
-  /* Internal adapter responses */
+  // Internal adapter responses
   final case class BlacklistCheckResult(
     rideId: String,
     passengerId: String,
@@ -76,7 +76,7 @@ object DispatcherProtocol:
     reason: Option[String]
   ) extends Command
 
-  /* Passenger responses */
+  // Passenger responses
   sealed trait RideResponse
   final case class RideAccepted(
     rideId: String,
@@ -91,9 +91,9 @@ object DispatcherProtocol:
   final case class ETAUnavailable(reason: String) extends ETAResponse
 
 
-/* =========================================================
+/* ===========================
  * Driver Protocol
- * ========================================================= */
+ * =========================== */
 object DriverProtocol:
 
   sealed trait Command
@@ -110,9 +110,9 @@ object DriverProtocol:
   final case class CancelRide(rideId: String) extends Command
 
 
-/* =========================================================
+/* ===========================
  * Pricing Service Protocol
- * ========================================================= */
+ * =========================== */
 object PricingProtocol:
 
   sealed trait Command
@@ -128,9 +128,9 @@ object PricingProtocol:
   ) extends Command
 
 
-/* =========================================================
+/* ================
  * Bank Protocol
- * ========================================================= */
+ * ================ */
 object BankProtocol:
 
   sealed trait Command
@@ -144,9 +144,9 @@ object BankProtocol:
   ) extends Command
 
 
-/* =========================================================
+/* =============================
  * Passenger Blacklist Protocol
- * ========================================================= */
+ * ============================= */
 object BlacklistProtocol:
 
   sealed trait Command
@@ -163,9 +163,9 @@ object BlacklistProtocol:
   ) extends Command
 
 
-/* =========================================================
+/* ========================================
  * Ride Monitor Protocol (Event Sourcing)
- * ========================================================= */
+ * ======================================== */
 object MonitorProtocol:
 
   sealed trait Command
@@ -177,7 +177,7 @@ object MonitorProtocol:
   final case class QueryMostProfitableDriver(replyTo: ActorRef[MostProfitableDriver]) extends Command
   final case class QueryAverageRideTime(replyTo: ActorRef[AverageRideTime]) extends Command
 
-  /* Persistent events */
+  // Persistent events
   enum RideEvent:
     case RideRequested(rideId: String, passengerId: String, timestampMillis: Long)
     case RideMatched(rideId: String, driverId: String, fare: BigDecimal, timestampMillis: Long)
@@ -193,7 +193,7 @@ object MonitorProtocol:
     case RideCancelled(rideId: String, cancelledBy: String, timestampMillis: Long)
     case DriverRated(driverId: String, rating: Int, timestampMillis: Long)
 
-  /* Analytics responses */
+  // Analytics responses
   final case class TotalRevenue(amount: BigDecimal)
   final case class BusiestHour(hour: Int, rideCount: Int)
   final case class MostProfitableDriver(driverId: String, earnings: BigDecimal)

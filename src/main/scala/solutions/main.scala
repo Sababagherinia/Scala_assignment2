@@ -54,7 +54,7 @@ object Main  {
         ctx.spawn(PassengerBlacklist(), "passenger-blacklist")
 
       /* =========================
-       * Dispatcher (supervised)
+       * Dispatcher
        * ========================= */
 
       val dispatcher =
@@ -126,7 +126,7 @@ object Main  {
     val now = System.currentTimeMillis()
     val oneDayAgo = now - (24 * 3600 * 1000)
     
-    // Define rush hours with more rides
+    // Defining rush hours with more rides
     val rushHours = List(
       (8, 8),   // 8am - morning rush (8 rides)
       (18, 6),  // 6pm - evening rush (6 rides)

@@ -5,9 +5,9 @@ import akka.actor.typed.scaladsl.Behaviors
 import solutions.domain.Coord
 import solutions.protocol.{DispatcherProtocol, PricingProtocol}
 
-/**
- * PricingService computes ride fares based on distance and time of day.
- */
+
+//  PricingService computes ride fares based on distance and time of day.
+
 object PricingService {
 
   def apply(): Behavior[PricingProtocol.Command] =
@@ -50,7 +50,7 @@ object PricingService {
       }
     }
 
-  /** Rush hours: 07–09 and 16–18 */
+  // Rush hours: 07–09 and 16–18
   private def isRushHour(tsMillis: Long): Boolean = {
     val hour =
       java.time.Instant
